@@ -1,6 +1,8 @@
 #include<stdio.h>
+#include<stdlib.h>
 
-const QUEUE_SIZE = 10;
+#define QUEUE_SIZE 5
+
 int current_queue_size = 0, isFull = 0, isEmpty = 0;
 
 typedef struct
@@ -19,15 +21,19 @@ void initQueue(Queue *queue)
 
 void enqueue(Queue *queue, int element) 
 {
-    if (queue->rear == queue->front == -1)
+    if (queue->rear == -1 && queue->front == -1)
     {
         queue->front = 0;
         queue->rear = 0;
+
+        queue->rear = (queue->rear + 1) % QUEUE_SIZE;
+        queue->q[queue->rear] = element;
+        current_queue_size++;
     }
     else if ((queue->rear + 1) % QUEUE_SIZE == queue->front)
     {
         isFull = 1;
-        printf("Queue is full");
+        printf("Queue is full\n");
     }
     else
     {
@@ -39,14 +45,15 @@ void enqueue(Queue *queue, int element)
 
 int dequeue(Queue *queue)
 {
+    if (queue->front == queue->rear)
+    {
+        queue->front = -1; 
+        queue->rear = -1;
+    }
     if (queue->front == -1 && queue->rear == -1)   
     {
         isEmpty = 1;
-        printf("Queue is empty");
-    }
-    else if (queue->front == queue->rear)
-    {
-        queue->front = queue->rear = -1;
+        printf("Queue is empty\n");
     }
     else 
     {
@@ -59,14 +66,21 @@ int dequeue(Queue *queue)
 
 int front(Queue *queue)
 {
-    if (!(isEmpty == 1))
+    int front_index = 0;
+    if (isEmpty != 1 && queue->front != queue->rear)
     {
-        return queue->q[queue->front + 1];
+        front_index = (queue->front + 1) % QUEUE_SIZE;
+        return queue->q[front_index];
+    }
+    else
+    {
+        printf("Queue is empty\n");
+        return;
     }
 }
 
 void display_queue(Queue *queue){
-    printf("[");
+    printf("Queue: [");
     for (int i = 0; i < QUEUE_SIZE; i++)
     {
         printf("%d ", queue->q[i]);
@@ -124,22 +138,7 @@ int main(int argc, char const *argv[])
 {
     Queue testQueue;
     initQueue(&testQueue);
+    menu_queue(&testQueue);
 
-    /*enqueue(&testQueue, 5);
-    enqueue(&testQueue, 10);
-    enqueue(&testQueue, 15);
-
-    printf("First dequeue: %d\n", dequeue(&testQueue));
-
-    enqueue(&testQueue, 20);
-    printf("Second dequeue: %d\n", dequeue(&testQueue));
-    printf("Third dequeue: %d\n", dequeue(&testQueue));
-    printf("Fourth dequeue: %d\n", dequeue(&testQueue));
-    printf("Fifth dequeue: %d\n", dequeue(&testQueue));
-    printf("Sixth dequeue: %d\n", dequeue(&testQueue));
-    */
-   
-   menu_queue(&testQueue);
-
-   return 0;
+    return 0;
 }
