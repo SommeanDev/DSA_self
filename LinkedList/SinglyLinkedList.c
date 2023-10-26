@@ -7,11 +7,13 @@ struct Node{
 };
 
 struct Node *head_node;
+int list_length = 0;
 
 void create_head(int element){
     head_node = (struct Node *)malloc(sizeof(struct Node));
     head_node->data = element;
     head_node->next = NULL;
+    list_length++;
 }
 
 void insert_end(int value){
@@ -19,7 +21,7 @@ void insert_end(int value){
     temp = head_node;
     if (head_node == NULL)
     {
-        printf("create head node first");
+        printf("create head node first\n");
     }
     else
     {
@@ -30,7 +32,9 @@ void insert_end(int value){
 
         newNode = (struct Node *)malloc(sizeof(struct Node));
         newNode->data = value;
+        newNode->next = NULL; 
         temp->next = newNode;
+        list_length++;
     }
 }
 
@@ -49,6 +53,7 @@ void insert_begin(int value)
         temp = head_node;
         head_node = newNode;
         head_node->next = temp;
+        list_length++;
     }
 }
 
@@ -73,6 +78,119 @@ void insert_between(int value, int position)
         new_node->data = value;
         prev_node->next = new_node;
         new_node->next = temp;
+        list_length++;
+    }
+}
+
+int delete_front()
+{
+    struct Node *temp, *prev_node;
+    int value;
+    temp = head_node;
+    temp = head_node;
+    if (head_node == NULL)
+    {
+        printf("List is empty. Create head node first\n");
+    }
+    else
+    {
+        prev_node = temp;
+        value = prev_node->data;
+        head_node = head_node->next;
+        free(prev_node);
+        list_length--;
+    }
+    return value;
+}
+
+int delete_end()
+{
+    struct Node *temp, *prev_node;
+    int value;
+    temp = head_node;
+    if (head_node == NULL)
+    {
+        printf("List is empty. Create head node first\n");
+    }
+    else
+    {
+        while (temp->next!= NULL)
+        {
+            prev_node = temp;
+            temp = temp->next;
+        }
+        value = temp->data;
+        prev_node->next = NULL;
+        free(temp);
+        list_length--;
+    }
+    return value;
+}
+
+int delete_between(int position)
+{
+    struct Node *temp, *prev_node, *next_node;
+    int value, index = 0;
+    temp = head_node;
+    
+    if (head_node == NULL) 
+    {
+        printf("List is empty. Create head node first\n");
+        return -1;
+    } 
+    
+    if (position == 0)
+    {
+        return delete_front();
+    }
+    
+    while ((temp != NULL) && (index < position)) 
+    {
+        prev_node = temp;
+        temp = temp->next;
+        index++;
+    }
+
+    if (temp == NULL)
+    {
+        printf("Position not found in the list.\n");
+        return -1;
+    }
+
+    next_node = temp->next;
+    value = temp->data;
+    prev_node->next = next_node;
+    free(temp);
+    list_length--;
+    
+    return value;
+}
+
+
+void search_list(int value)
+{
+    struct Node *temp;
+    int index = 0;
+    temp = head_node;
+    if (head_node == NULL)
+    {
+        printf("List is empty. Create head node first\n");
+    }
+    else
+    {
+        while (temp!= NULL && temp->data!= value)
+        {
+            temp = temp->next;
+            index++;
+        }
+        if (temp == NULL)
+        {
+            printf("Element not found\n");
+        }
+        else
+        {
+            printf("Element found. Element at %d index\n", index);
+        }
     }
 }
 
@@ -97,14 +215,8 @@ void traverse()
     
 }
 
-int main(int argc, char const *argv[])
+void menu_List()
 {
-    /* create_head(10);
-    insert_begin(20);
-    insert_begin(30);
-    insert_between(40, 1);
-    traverse(); */
-
     int value, position, reply, breakloop = 0;
     
     while (breakloop != 1)
@@ -114,6 +226,11 @@ int main(int argc, char const *argv[])
         printf("2 - insert value in front\n");
         printf("3 - insert value in between\n");
         printf("4 - insert value at end\n");
+        printf("5 - delete value from front\n");
+        printf("6 - delete value from end\n");
+        printf("7 - delete value from between\n");
+        printf("8 - Search an element in the list\n");
+        printf("9 - View List Length\n");
         printf("(Enter an other no. to exit)\n");
         printf("You: ");
 
@@ -150,13 +267,39 @@ int main(int argc, char const *argv[])
             printf("Current list: ");
             traverse();
             break;
+        case 5:
+            printf("Deleted value: %d\n", delete_front());
+            traverse();
+            break;
+        case 6:
+            printf("Deleted value: %d\n", delete_end());
+            traverse();
+            break;
+        case 7:
+            printf("Enter position to delete: ");
+            scanf("%d", &position);
+            printf("Deleted value: %d\n", delete_between(position));
+            traverse();
+            break;
+        case 8:
+            printf("Enter value to search: ");
+            scanf("%d", &value);
+            search_list(value);
+            break;
+        case 9:
+            printf("Length of the List is: %d\n",list_length);
+            traverse();
+            break;
         default:
             printf("Exiting ...\n");
             breakloop = 1;
             break;
         }
     }
-    
+}
 
+int main(int argc, char const *argv[])
+{
+    menu_List();
     return 0;
 }
